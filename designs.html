@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Designs — Jackson Mutailoni</title>
+
+  <!-- Preconnect for Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <main class="page">
+    <a href="index.html" class="back-link">← Back to portfolio</a>
+
+    <div class="page-heading">
+      <span class="page-num">Archive —</span>
+      <h1 class="page-title">All Designs</h1>
+    </div>
+    <p class="page-sub" id="pageSubtitle"></p>
+
+    <!-- Mobile bar -->
+    <div class="mobile-bar">
+      <button class="btn-filter-open" id="filterOpenBtn">
+        <span>⊟</span> Filter <span class="muted" id="mobileActiveLabel">· All</span>
+      </button>
+      <button class="btn-shuffle-sm" id="shuffleBtnMobile">↻ Shuffle</button>
+    </div>
+
+    <!-- Main grid -->
+    <div class="main-grid">
+      <aside class="sidebar">
+        <div class="sidebar-sticky">
+          <div class="sidebar-header">
+            <span class="sidebar-label">Categories</span>
+            <button class="btn-shuffle-tiny" id="shuffleBtnDesktop" aria-label="Shuffle">↻</button>
+          </div>
+          <nav class="filter-nav" id="filterNav"></nav>
+        </div>
+      </aside>
+      <div>
+        <p class="results-meta" id="resultsMeta"></p>
+        <div class="designs-grid" id="designsGrid"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Mobile drawer -->
+  <div class="drawer-overlay" id="drawerOverlay">
+    <div class="drawer" id="drawer">
+      <div class="drawer-head">
+        <h2 class="drawer-title">Filter by category</h2>
+        <button class="drawer-close" id="drawerClose">✕</button>
+      </div>
+      <nav class="filter-nav" id="filterNavMobile"></nav>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox hidden" id="lightbox">
+    <button class="lb-close" id="lbClose">✕</button>
+    <button class="lb-prev" id="lbPrev">&#8249;</button>
+    <button class="lb-next" id="lbNext">&#8250;</button>
+    <div class="lb-content" id="lbContent"></div>
+  </div>
+
+  <!-- Scripts deferred so they don't block rendering -->
+  <script src="js/works-data.js" defer></script>
+  <script src="js/designs.js" defer></script>
+</body>
+</html>
