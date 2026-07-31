@@ -1,0 +1,101 @@
+const projects = [
+  { year:"2026", title:"Mosima Cars & Logistics", description:"Business website for a Zambia-based clearing, forwarding & vehicle logistics company — featuring their services, Nakonde border clearance specialisation, and fleet hire offerings across Zambia, Zimbabwe & the DRC.", stack:["HTML","CSS","JavaScript"], url:"https://mosimas.netlify.app/" },
+  { year:"2026", title:"Gospel Envoys Radio and Tv Ministry",     description:"It is a ministry website that serves as a directory of faith-based TV and radio broadcasting platform that aids the department in keeping track of all the platforms that the department can reach by spreading the Gospel across all 10 provinces of Zambia.",         stack:["PHP","CSS","JavaScript", "SQL"],            url:"https://gec.cu.ma/" },
+  { year:"2026", title:"JJM 2026 — My Day Plan", description:"A personal spiritual growth planner web app — daily schedule tracker across morning/afternoon/evening sessions, growth targets, prophecy & confession archives, book/course trackers, a prayer journal, giving log, and PDF/report export, with Google sign-in and cloud sync.", stack:["React","Firebase","Tailwind CSS"], url:"https://jjmplanner.netlify.app/" },
+  { year:"2026", title:"KCHSR Premier League", description:"Official website for the Kafue College of Health Sciences & Research's inter-semester football league — live league table, match updates, results, fixtures, transfer news, player stats and club profiles for all six competing teams.", stack:["PHP","CSS","JavaScript","SQL"], url:"https://kchsr.cu.ma" },
+  { year:"2026", title:"Krugers Metal Fabrication", description:"Business website for a Lusaka-based custom metal fabrication company — showcasing gates, architectural metalwork, structural steel, machinery parts and welding services from concept to installation.", stack:["HTML","CSS","JavaScript"], url:"https://kruger-metals.onrender.com/" },
+  { year:"2026", title:"Hospital Management System", description:"Upcoming system for managing patient records, appointments, billing, and hospital staff workflows.", stack:["Coming Soon"], url:"#" },
+  { year:"2026", title:"Money Lending Business Management System", description:"Upcoming system for managing loan applications, repayments, interest tracking, and borrower records for lending businesses.", stack:["Coming Soon"], url:"#" },
+  { year:"2026", title:"Online Shopping Management System", description:"Upcoming e-commerce management platform covering product catalogs, orders, inventory, and customer accounts.", stack:["Coming Soon"], url:"#" },
+];
+
+const skills = ["Graphic Design","Web Development","Website Design","Data Entry","Typing","Video Editing","Responsive Design"];
+
+// Skills
+const skillsList = document.getElementById('skillsList');
+skills.forEach(s => {
+  const span = document.createElement('span');
+  span.className = 'skill-tag';
+  span.textContent = s;
+  skillsList.appendChild(span);
+});
+
+// Projects
+const projectsGrid = document.getElementById('projectsGrid');
+projects.forEach(p => {
+  const linkHTML = p.url === '#'
+    ? `<span class="project-link project-link--soon">Coming Soon</span>`
+    : `<a href="${p.url}" target="_blank" rel="noreferrer" class="project-link">Visit Site ↗</a>`;
+  projectsGrid.innerHTML += `<article class="project-card">
+    <span class="project-year">${p.year}</span>
+    <h3 class="project-name">${p.title}</h3>
+    <p class="project-desc">${p.description}</p>
+    <div class="project-stack">${p.stack.map(s => `<span class="stack-tag">${s}</span>`).join('')}</div>
+    <div class="project-footer">${linkHTML}</div>
+  </article>`;
+});
+
+// Design Grid
+let visibleWorks = [];
+const designGrid = document.getElementById('designGrid');
+
+function renderDesignGrid(arr) {
+  visibleWorks = arr.slice(0, 12);
+  designGrid.innerHTML = visibleWorks.map((w, i) => `
+    <article class="design-card" data-index="${i}">
+      <div class="card-thumb">
+        ${cardThumbHTML(w)}
+        <span class="card-cat-badge">${w.category}</span>
+        <div class="card-overlay"><span>Click to expand →</span></div>
+      </div>
+      <div class="card-info">
+        <div class="card-info-row">
+          <span class="card-title">${w.title}</span>
+          <span class="card-year">${w.year}</span>
+        </div>
+        <p class="card-desc">${w.description}</p>
+        ${w.note ? `<p class="card-note">⚠ Disclaimer: ${w.note}</p>` : ''}
+      </div>
+    </article>`).join('');
+
+  designGrid.querySelectorAll('.design-card').forEach(card => {
+    card.addEventListener('click', () => openLightbox(parseInt(card.dataset.index)));
+  });
+}
+
+const { openLightbox } = initLightbox(() => visibleWorks);
+
+let currentWorks = shuffle(works);
+renderDesignGrid(currentWorks);
+
+document.getElementById('viewAllBtn').textContent = `View all ${works.length} designs →`;
+document.getElementById('shuffleBtn').addEventListener('click', () => {
+  currentWorks = shuffle(works);
+  renderDesignGrid(currentWorks);
+});
+
+// Contact form
+document.getElementById('contactForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name    = document.getElementById('fname').value;
+  const email   = document.getElementById('femail').value;
+  const subject = document.getElementById('fsubject').value.trim() || `Portfolio inquiry from ${name || 'your site'}`;
+  const message = document.getElementById('fmessage').value;
+  const body    = `Name: ${name}\nEmail: ${email}\n\n${message}\n`;
+  window.location.href = `mailto:jmutailoni@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  document.getElementById('formNote').textContent = "Your email app should have opened — hit send to deliver your message.";
+});
+
+// Year
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// Reveal on scroll
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('is-visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
