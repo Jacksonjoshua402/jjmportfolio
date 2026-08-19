@@ -75,16 +75,38 @@ document.getElementById('shuffleBtn').addEventListener('click', () => {
   renderDesignGrid(currentWorks);
 });
 
-// Contact form
-document.getElementById('contactForm').addEventListener('submit', e => {
+// Contact form (Netlify AJAX Submission)
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
   e.preventDefault();
-  const name    = document.getElementById('fname').value;
-  const email   = document.getElementById('femail').value;
-  const subject = document.getElementById('fsubject').value.trim() || `Portfolio inquiry from ${name || 'your site'}`;
-  const message = document.getElementById('fmessage').value;
-  const body    = `Name: ${name}\nEmail: ${email}\n\n${message}\n`;
-  window.location.href = `mailto:jmutailoni@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  document.getElementById('formNote').textContent = "Your email app should have opened — hit send to deliver your message.";
+  
+  const form = e.target;
+  const formNote = document.getElementById('formNote');
+  const btn = form.querySelector('.btn-send');
+  
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+
+  const formData = new FormData(form);
+
+  try {
+    const response = await fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formData).toString()
+    });
+
+    if (response.ok) {
+      formNote.textContent = "Thank you! Your message has been sent successfully.";
+      form.reset();
+    } else {
+      formNote.textContent = "Oops! There was a problem submitting your form.";
+    }
+  } catch (error) {
+    formNote.textContent = "Network error. Please try again later.";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Send Message →";
+  }
 });
 
 // Year
