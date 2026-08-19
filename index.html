@@ -118,15 +118,18 @@
         </div>
         <p class="section-sub">I'm interested in collaborating on projects that push creative boundaries.</p>
         <div class="contact-grid">
-          <form class="contact-form" id="contactForm">
+          <form class="contact-form" id="contactForm" name="contact" method="POST" data-netlify="true">
+            <!-- Hidden input required for Netlify bot detection -->
+            <input type="hidden" name="form-name" value="contact" />
+
             <div class="form-row">
-              <input class="form-input" type="text" id="fname" placeholder="Your name" required />
-              <input class="form-input" type="email" id="femail" placeholder="Your email" required />
+              <input class="form-input" type="text" id="fname" name="name" placeholder="Your name" required />
+              <input class="form-input" type="email" id="femail" name="email" placeholder="Your email" required />
             </div>
-            <input class="form-input" type="text" id="fsubject" placeholder="Subject (optional)" />
-            <textarea class="form-input form-textarea" id="fmessage" rows="5" placeholder="Tell me about your project..." required></textarea>
+            <input class="form-input" type="text" id="fsubject" name="subject" placeholder="Subject (optional)" />
+            <textarea class="form-input form-textarea" id="fmessage" name="message" rows="5" placeholder="Tell me about your project..." required></textarea>
             <div class="form-footer">
-              <p class="form-note" id="formNote">This will open your email app pre-filled and addressed to me.</p>
+              <p class="form-note" id="formNote">Your message will be sent directly to my inbox.</p>
               <button type="submit" class="btn-send">Send Message →</button>
             </div>
           </form>
