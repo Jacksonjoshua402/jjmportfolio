@@ -123,6 +123,8 @@ function initLightbox(getFiltered) {
   const lbContent = document.getElementById('lbContent');
   let lbIndex = null;
 
+  if (!lightbox || !lbContent) return { openLightbox: () => {} };
+
   // Zoom state
   const ZOOM_MIN = 1, ZOOM_MAX = 4, ZOOM_STEP = 0.5;
   let zoom = 1, panX = 0, panY = 0;
@@ -141,7 +143,6 @@ function initLightbox(getFiltered) {
   }
 
   function clampPan() {
-    // Keep it simple — just prevent runaway panning at low zoom
     if (zoom <= 1) { panX = 0; panY = 0; }
   }
 
@@ -195,11 +196,15 @@ function initLightbox(getFiltered) {
 
     applyTransform();
 
-    document.getElementById('lbZoomIn').addEventListener('click', e => { e.stopPropagation(); setZoom(zoom + ZOOM_STEP); });
-    document.getElementById('lbZoomOut').addEventListener('click', e => { e.stopPropagation(); setZoom(zoom - ZOOM_STEP); });
-    document.getElementById('lbZoomReset').addEventListener('click', e => { e.stopPropagation(); resetZoom(); });
+    const zoomInBtn = document.getElementById('lbZoomIn');
+    const zoomOutBtn = document.getElementById('lbZoomOut');
+    const zoomResetBtn = document.getElementById('lbZoomReset');
 
-    // Double-click / double-tap to toggle zoom
+    if (zoomInBtn) zoomInBtn.addEventListener('click', e => { e.stopPropagation(); setZoom(zoom + ZOOM_STEP); });
+    if (zoomOutBtn) zoomOutBtn.addEventListener('click', e => { e.stopPropagation(); setZoom(zoom - ZOOM_STEP); });
+    if (zoomResetBtn) zoomResetBtn.addEventListener('click', e => { e.stopPropagation(); resetZoom(); });
+
+    // Double-click to toggle zoom
     img.addEventListener('dblclick', e => {
       e.stopPropagation();
       zoom > 1 ? resetZoom() : setZoom(2);
@@ -212,7 +217,7 @@ function initLightbox(getFiltered) {
       setZoom(zoom + delta);
     }, { passive: false });
 
-    // Drag to pan when zoomed (mouse)
+    // Drag to pan (mouse)
     img.addEventListener('mousedown', e => {
       if (zoom <= 1) return;
       e.preventDefault();
@@ -229,7 +234,7 @@ function initLightbox(getFiltered) {
     });
     window.addEventListener('mouseup', () => { isPanning = false; applyTransform(); });
 
-    // Touch: pinch to zoom + drag to pan
+    // Touch events
     wrap.addEventListener('touchstart', e => {
       if (e.touches.length === 2) {
         pinchStartDist = touchDist(e.touches);
@@ -280,20 +285,31 @@ function initLightbox(getFiltered) {
     lbIndex = null;
   }
 
-  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  const closeBtn = document.getElementById('lbClose');
+  const prevBtn = document.getElementById('lbPrev');
+  const nextBtn = document.getElementById('lbNext');
+
+  if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
   lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-  document.getElementById('lbPrev').addEventListener('click', e => {
-    e.stopPropagation();
-    const filtered = getFiltered();
-    lbIndex = (lbIndex - 1 + filtered.length) % filtered.length;
-    renderLightbox();
-  });
-  document.getElementById('lbNext').addEventListener('click', e => {
-    e.stopPropagation();
-    const filtered = getFiltered();
-    lbIndex = (lbIndex + 1) % filtered.length;
-    renderLightbox();
-  });
+  
+  if (prevBtn) {
+    prevBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const filtered = getFiltered();
+      lbIndex = (lbIndex - 1 + filtered.length) % filtered.length;
+      renderLightbox();
+    });
+  }
+  
+  if (nextBtn) {
+    nextBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      const filtered = getFiltered();
+      lbIndex = (lbIndex + 1) % filtered.length;
+      renderLightbox();
+    });
+  }
+
   document.addEventListener('keydown', e => {
     if (lightbox.classList.contains('hidden')) return;
     const filtered = getFiltered();
