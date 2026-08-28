@@ -123,8 +123,6 @@ function initLightbox(getFiltered) {
   const lbContent = document.getElementById('lbContent');
   let lbIndex = null;
 
-  if (!lightbox || !lbContent) return { openLightbox: () => {} };
-
   // Zoom state
   const ZOOM_MIN = 1, ZOOM_MAX = 4, ZOOM_STEP = 0.5;
   let zoom = 1, panX = 0, panY = 0;
@@ -143,6 +141,7 @@ function initLightbox(getFiltered) {
   }
 
   function clampPan() {
+    // Keep it simple — just prevent runaway panning at low zoom
     if (zoom <= 1) { panX = 0; panY = 0; }
   }
 
@@ -168,8 +167,10 @@ function initLightbox(getFiltered) {
     const dark = darkCardLogos.includes(w.img);
     const mediaHTML = isLogo
       ? `<div class="lb-logo-wrap">${logoMockupHTML(w.img, w.title, true, dark)}</div>`
-      : `<div class="lb-img-wrap">
-           <img class="lb-img" src="${w.img}" alt="${w.title}" draggable="false" />
+      : `<div class="lb-img-outer">
+           <div class="lb-img-wrap">
+             <img class="lb-img" src="${w.img}" alt="${w.title}" draggable="false" />
+           </div>
            <div class="lb-zoom-controls" id="lbZoomControls">
              <button type="button" class="lb-zoom-btn" id="lbZoomOut" aria-label="Zoom out">−</button>
              <span class="lb-zoom-pct" id="lbZoomPct">100%</span>
@@ -196,15 +197,11 @@ function initLightbox(getFiltered) {
 
     applyTransform();
 
-    const zoomInBtn = document.getElementById('lbZoomIn');
-    const zoomOutBtn = document.getElementById('lbZoomOut');
-    const zoomResetBtn = document.getElementById('lbZoomReset');
+    document.getElementById('lbZoomIn').addEventListener('click', e => { e.stopPropagation(); setZoom(zoom + ZOOM_STEP); });
+    document.getElementById('lbZoomOut').addEventListener('click', e => { e.stopPropagation(); setZoom(zoom - ZOOM_STEP); });
+    document.getElementById('lbZoomReset').addEventListener('click', e => { e.stopPropagation(); resetZoom(); });
 
-    if (zoomInBtn) zoomInBtn.addEventListener('click', e => { e.stopPropagation(); setZoom(zoom + ZOOM_STEP); });
-    if (zoomOutBtn) zoomOutBtn.addEventListener('click', e => { e.stopPropagation(); setZoom(zoom - ZOOM_STEP); });
-    if (zoomResetBtn) zoomResetBtn.addEventListener('click', e => { e.stopPropagation(); resetZoom(); });
-
-    // Double-click to toggle zoom
+    // Double-click / double-tap to toggle zoom
     img.addEventListener('dblclick', e => {
       e.stopPropagation();
       zoom > 1 ? resetZoom() : setZoom(2);
@@ -217,7 +214,7 @@ function initLightbox(getFiltered) {
       setZoom(zoom + delta);
     }, { passive: false });
 
-    // Drag to pan (mouse)
+    // Drag to pan when zoomed (mouse)
     img.addEventListener('mousedown', e => {
       if (zoom <= 1) return;
       e.preventDefault();
@@ -234,7 +231,7 @@ function initLightbox(getFiltered) {
     });
     window.addEventListener('mouseup', () => { isPanning = false; applyTransform(); });
 
-    // Touch events
+    // Touch: pinch to zoom + drag to pan
     wrap.addEventListener('touchstart', e => {
       if (e.touches.length === 2) {
         pinchStartDist = touchDist(e.touches);
@@ -285,31 +282,20 @@ function initLightbox(getFiltered) {
     lbIndex = null;
   }
 
-  const closeBtn = document.getElementById('lbClose');
-  const prevBtn = document.getElementById('lbPrev');
-  const nextBtn = document.getElementById('lbNext');
-
-  if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
   lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-  
-  if (prevBtn) {
-    prevBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      const filtered = getFiltered();
-      lbIndex = (lbIndex - 1 + filtered.length) % filtered.length;
-      renderLightbox();
-    });
-  }
-  
-  if (nextBtn) {
-    nextBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      const filtered = getFiltered();
-      lbIndex = (lbIndex + 1) % filtered.length;
-      renderLightbox();
-    });
-  }
-
+  document.getElementById('lbPrev').addEventListener('click', e => {
+    e.stopPropagation();
+    const filtered = getFiltered();
+    lbIndex = (lbIndex - 1 + filtered.length) % filtered.length;
+    renderLightbox();
+  });
+  document.getElementById('lbNext').addEventListener('click', e => {
+    e.stopPropagation();
+    const filtered = getFiltered();
+    lbIndex = (lbIndex + 1) % filtered.length;
+    renderLightbox();
+  });
   document.addEventListener('keydown', e => {
     if (lightbox.classList.contains('hidden')) return;
     const filtered = getFiltered();
